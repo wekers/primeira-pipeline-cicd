@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: web
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: web
@@ -13,18 +14,36 @@ spec:
     spec:
       containers:
       - name: web
-        image: wekers/aula-primeira-pipeline
+        image: wekers/aula-primeira-pipeline:v{{ github.run_number }}
         ports:
         - containerPort: 5000
 --- 
 apiVersion: v1
 kind: Service
 metadata:
-  name: web
+  name: web-service
 spec:
   selector:
     app: web
   ports:
   - port: 80
     targetPort: 5000
-  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-ingress
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+spec:
+  rules:
+  - host: web.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-service
+            port:
+              number: 80
