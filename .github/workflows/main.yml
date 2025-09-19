@@ -43,7 +43,8 @@ jobs:
         run: |
           mkdir -p ~/.kube
           echo '${{ secrets.K8S_CONFIG }}' > ~/.kube/config
-          kubectl config use-context default
+          kubectl config use-context k3d-meucluster
+          kubectl cluster-info
           
       - name: Deploy da aplicação
         run: |
@@ -58,4 +59,4 @@ jobs:
           kubectl get pods -o wide
           kubectl get services
           kubectl get ingress
-          echo "A aplicação estará disponível em: http://web.local"
+          echo "A aplicação estará disponível em: http://web.local:81"
